@@ -39,7 +39,7 @@ function connect() {
     if (statusText) statusText.textContent = '已连接';
     statusEl.classList.add('connected');
     statusEl.classList.remove('disconnected');
-    console.log('WebSocket 连接成功');
+    console.log('连接成功');
   };
 
   ws.onmessage = (event) => {
@@ -53,12 +53,12 @@ function connect() {
     if (statusText) statusText.textContent = '已断开';
     statusEl.classList.add('disconnected');
     statusEl.classList.remove('connected');
-    console.log('WebSocket 连接断开，3秒后重连...');
+    console.log('连接断开，3秒后重连...');
     setTimeout(connect, 3000);
   };
 
   ws.onerror = (error) => {
-    console.error('WebSocket 错误:', error);
+    console.error('错误:', error);
   };
 }
 
@@ -344,14 +344,31 @@ function deleteRow(rowIndex) {
   }
 }
 
+// CSV 格式化函数（处理包含逗号、引号、换行符的字段）
+function formatCSV(data) {
+  return data.map(row => {
+    return row.map(cell => {
+      const cellStr = String(cell || '');
+      // 如果包含逗号、引号或换行符，需要用引号包裹
+      if (cellStr.includes(',') || cellStr.includes('"') || cellStr.includes('\n') || cellStr.includes('\r')) {
+        // 转义引号（双引号变成两个双引号）
+        return `"${cellStr.replace(/"/g, '""')}"`;
+      }
+      return cellStr;
+    }).join(',');
+  }).join('\n');
+}
+
 // 导出 CSV
 exportBtn.addEventListener('click', () => {
-  const csvContent = csvData.map(row => row.join(',')).join('\n');
+  const csvContent = formatCSV(csvData);
   const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
   link.href = URL.createObjectURL(blob);
-  link.download = `export_${new Date().getTime()}.csv`;
+  const datetime = new Date().toISOString().replace(/[-:]/g, '').replace('T', '_').split('.')[0];
+  link.download = `export_${datetime}.csv`;
   link.click();
+  console.log('✓ CSV 已导出');
 });
 
 // 上传 CSV 文件
