@@ -1,0 +1,14 @@
+{
+  "name": "collaborative-csv-editor",
+  "version": "1.0.0",
+  "description": "多人实时协作 CSV 编辑器",
+  "type": "module",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "ws": "^8.14.2"
+  }
+}
